@@ -41,7 +41,7 @@ class Knights {
     ArrayList<Integer> attemptedRuns = new ArrayList<>();
     private int[][] board;
 
-    private int locRow, locCol, moveCounter;
+    private int locRow, locCol, moveNumber, moveCounter;
     private boolean tourOngoing;
 
     Knights() {
@@ -55,6 +55,7 @@ class Knights {
         locRow = (board.length / 2);
 
         board[locRow][locCol] = 1;
+        moveNumber = 1;
         moveCounter = 1;
 
         runTour();
@@ -67,7 +68,7 @@ class Knights {
     // the tour is a success.
     private void runTour() {
 
-        while(attemptedRuns.size() < 100000) {
+        while(attemptedRuns.size() < 1000) {
 
             tourOngoing = true;
 
@@ -94,6 +95,14 @@ class Knights {
             System.out.println(moveCounter + " moves where made during this tour.");
             System.out.println("Final board: ");
             printBoard();
+
+            // Reset
+            resetBoard();
+            locCol = (board.length / 2); //(board.length / 2) is center of board
+            locRow = (board.length / 2);
+            board[locRow][locCol] = 1;
+            moveCounter = 0;
+            moveNumber = 1;
 
             System.out.println("CURRENT RUN: " + attemptedRuns.size());
 
@@ -163,8 +172,9 @@ class Knights {
                 locRow = locRow + V_SHIFT[chosenMove];
                 locCol = locCol + H_SHIFT[chosenMove];
                 moveCounter += 1;
+                moveNumber++;
 
-                board[locRow][locCol] = 1;
+                board[locRow][locCol] = moveNumber;
                 keepMoving = false;
 
                 printBoard();
@@ -178,10 +188,6 @@ class Knights {
                 System.out.println("The Knight is stuck. Failure.");
 
                 attemptedRuns.add(moveCounter);
-
-                // Reset
-                resetBoard();
-                moveCounter = 0;
 
             }
 

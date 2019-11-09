@@ -8,20 +8,20 @@ import java.util.Arrays;
  */
 
 /* Knights 7.22 - a, b, and c.
-* This exercise had us create a knights tour and ultimately setup
-* heuristics that can choose the most optimal spots. Therefore, my
-* program, using this built-in insight, can achieve a full tour
-* much faster (and efficiently), compared to not choosing
-* moves optimally. It should usually take 5 to 15 tours on average
-* to fully complete a tour. Otherwise, it usually almost complete
-* on other runs.
-*
-* By looking at https://pdfs.semanticscholar.org/ebdf/b585eaea47f52ab774759da2c39fb6d0d8e6.pdf,
-* it seems the exercise we've completed falls under h1b, while if we included
-* part d it would be h2, which yields a higher complete tour rate. This was a
-* helpful document that demonstrated strategies and the algorithm efficiency
-* that heuristics may improve. Overall, a good read!
-* */
+ * This exercise had us create a knights tour and ultimately setup
+ * heuristics that can choose the most optimal spots. Therefore, my
+ * program, using this built-in insight, can achieve a full tour
+ * much faster (and efficiently), compared to not choosing
+ * moves optimally. It should usually take 5 to 15 tours on average
+ * to fully complete a tour. Otherwise, it usually almost complete
+ * on other runs.
+ *
+ * By looking at https://pdfs.semanticscholar.org/ebdf/b585eaea47f52ab774759da2c39fb6d0d8e6.pdf,
+ * it seems the exercise we've completed falls under h1b, while if we included
+ * part d it would be h2, which yields a higher complete tour rate. This was a
+ * helpful document that demonstrated strategies and the algorithm efficiency
+ * that heuristics may improve. Overall, a good read!
+ * */
 
 class Knights {
 
@@ -39,7 +39,7 @@ class Knights {
                                       { 3, 4, 6, 6, 6, 6, 4, 3 },
                                       { 2, 3, 4, 4, 4, 4, 3, 2 } };
 
-    private int locRow, locCol, moveCounter;
+    private int locRow, locCol, moveNumber, moveCounter;
     private boolean tourOngoing;
 
     Knights() {
@@ -49,10 +49,11 @@ class Knights {
         printBoard(); // Prints it
 
         // Change start location if need be, set to be at center.
-        locCol = 0; //(board.length / 2) is center of board
-        locRow = 0;
+        locCol = board.length / 2; //(board.length / 2) is center of board
+        locRow = board.length / 2;
 
         board[locRow][locCol] = 1;
+        moveNumber = 1;
         moveCounter = 1;
 
         runTour();
@@ -130,9 +131,11 @@ class Knights {
                 System.out.println("The way is clear! Making move: " + chosenMove);
                 locRow = locRow + V_SHIFT[chosenMove];
                 locCol = locCol + H_SHIFT[chosenMove];
+                // System.out.println("locRow is: " + locRow + " and locCol is:" + locCol);
                 moveCounter += 1;
+                moveNumber++;
 
-                board[locRow][locCol] = 1;
+                board[locRow][locCol] = moveNumber;
                 keepMoving = false;
 
                 printBoard();
@@ -141,9 +144,9 @@ class Knights {
 
             else {
 
-                    keepMoving = false;
-                    tourOngoing = false;
-                    System.out.println("The Knight is stuck. Failure.");
+                keepMoving = false;
+                tourOngoing = false;
+                System.out.println("The Knight is stuck. Failure.");
 
             }
 
@@ -176,9 +179,9 @@ class Knights {
     // an accessibility Level, and array lists for the accessibility values
     // 2, 3, 4, 6, and 8. A loop looks over the index of moves, and for each
     // move it'll determine what their level of access is. For each move, it
-    // adds it to the corresponding list. After the loop, each access list
-    // will be checked to determine the most optimal move to take. It favors
-    // 2 and than to the largest 8.
+    // adds it to the corresponding list and decrements the access level to simulate
+    // a shrinking board. After the loop, each access list will be checked
+    // to determine the most optimal move to take. It favors <= 2 through the largest 8.
     private int pickMove(ArrayList<Integer> moves) {
 
         int randomIndex;
@@ -199,7 +202,7 @@ class Knights {
 
             // System.out.println("DEBUG: i = " + i + ", Accessibility level of move: " + moves.get(i) + " is " + accessibilityLevel);
 
-            if (accessibilityLevel == 2) {
+            if (accessibilityLevel <= 2) {
 
                 accessibleTwo.add(integer);
                 // System.out.println(accessibleTwo.size());
@@ -209,12 +212,12 @@ class Knights {
                 accessibleThree.add(integer);
                 // System.out.println(accessibleThree.size());
 
-            } else if (accessibilityLevel == 4) {
+            } else if (accessibilityLevel == 4 || accessibilityLevel == 5) {
 
                 accessibleFour.add(integer);
                 // System.out.println(accessibleFour.size());
 
-            } else if (accessibilityLevel == 6) {
+            } else if (accessibilityLevel == 6 || accessibilityLevel == 7) {
 
                 accessibleSix.add(integer);
                 // System.out.println(accessibleSix.size());
@@ -225,6 +228,8 @@ class Knights {
                 // System.out.println(accessibleEight.size());
 
             }
+
+            --accessibility[accessRow][accessCol];
 
         }
 
@@ -273,6 +278,17 @@ class Knights {
             if(!(moves.size() <= 0)) {
 
                 move = accessibleEight.get(randomIndex);
+
+            }
+
+        }
+
+        else {
+
+            if(!(moves.size() <= 0)) {
+
+                randomIndex = (int)(Math.random()*moves.size());
+                move = moves.get(randomIndex);
 
             }
 
